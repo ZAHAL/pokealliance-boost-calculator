@@ -707,7 +707,7 @@
       var compareBar = document.createElement("div");
       compareBar.className = "tier-compare";
       var readyLabel = document.createElement("label");
-      readyLabel.textContent = "Preço do item pronto (mercado)";
+      readyLabel.textContent = "Preço do item pronto (mercado, por unidade)";
       var readyInput = document.createElement("input");
       readyInput.className = "ready-price-input";
       readyInput.type = "number";
@@ -860,21 +860,23 @@
         craftablePill.textContent = "Só dá pra fazer " + fmt(craftable) + " — faltam itens";
       }
 
-      // Craft cost vs. buying the finished stone ready-made.
-      var readyPrice = Number(state.readyPrice[tierIdx]) || 0;
+      // Craft cost vs. buying the finished stone ready-made — scaled by the
+      // same "quantidade que quero fazer", so it's N crafted vs. N bought ready.
+      var readyPriceUnit = Number(state.readyPrice[tierIdx]) || 0;
+      var readyPriceTotal = readyPriceUnit * multiplier;
       var head = tierHeadRefs[tierIdx];
       var pill = cmpPillRefs[tierIdx];
       head.classList.remove("cmp-good", "cmp-bad");
       pill.classList.remove("good", "bad");
-      if (readyPrice > 0 && tierTotal < readyPrice) {
+      if (readyPriceUnit > 0 && tierTotal < readyPriceTotal) {
         head.classList.add("cmp-good");
         pill.classList.add("good");
-        pill.textContent = "Craftar compensa";
-      } else if (readyPrice > 0 && tierTotal > readyPrice) {
+        pill.textContent = "Craftar compensa (pronto sairia " + fmt(readyPriceTotal) + ")";
+      } else if (readyPriceUnit > 0 && tierTotal > readyPriceTotal) {
         head.classList.add("cmp-bad");
         pill.classList.add("bad");
-        pill.textContent = "Comprar pronto compensa";
-      } else if (readyPrice > 0) {
+        pill.textContent = "Comprar pronto compensa (" + fmt(readyPriceTotal) + ")";
+      } else if (readyPriceUnit > 0) {
         pill.textContent = "Empate";
       } else {
         pill.textContent = "—";
